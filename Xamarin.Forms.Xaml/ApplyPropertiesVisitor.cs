@@ -75,12 +75,11 @@ namespace Xamarin.Forms.Xaml
 
 		public void Visit(ElementNode node, INode parentNode)
 		{
-			if (TryGetPropertyName(node, parentNode, out XmlName propertyName) && propertyName == XmlName._CreateContent) {
+			XmlName propertyName;
+			if (TryGetPropertyName(node, parentNode, out propertyName) && propertyName == XmlName._CreateContent) {
 				var s0 = Values[parentNode];
-				if (s0 is DataTemplateExtension)
-					s0 = Values[parentNode] = new DataTemplate();
-				if (s0 is ElementTemplate et) {
-					SetTemplate(et, node);
+				if (s0 is ElementTemplate) {
+					SetTemplate(s0 as ElementTemplate, node);
 					return;
 				}
 			}
@@ -89,8 +88,9 @@ namespace Xamarin.Forms.Xaml
 			propertyName = XmlName.Empty;
 
 			//Simplify ListNodes with single elements
-			if (parentNode as ListNode != null && (parentNode as ListNode).CollectionItems.Count == 1) {
-				propertyName = (parentNode as ListNode).XmlName;
+			var pList = parentNode as ListNode;
+			if (pList != null && pList.CollectionItems.Count == 1) {
+				propertyName = pList.XmlName;
 				parentNode = parentNode.Parent;
 				parentElement = parentNode as IElementNode;
 			}
